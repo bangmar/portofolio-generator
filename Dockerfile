@@ -1,6 +1,5 @@
 FROM node:20-bookworm-slim AS base
 WORKDIR /app
-ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 FROM base AS deps
@@ -34,6 +33,7 @@ COPY . .
 RUN npm run build
 
 FROM base AS runner
+ENV NODE_ENV=production
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     libnspr4 \
