@@ -9,6 +9,7 @@ const SectionCover: FC<CoverSectionProps> = ({
 	title,
 	pageNumber,
 	withPageNumber,
+	footerEnding = false,
 	footerType = "cover",
 }): ReactElement => {
 	return (
@@ -17,7 +18,9 @@ const SectionCover: FC<CoverSectionProps> = ({
 			<section className='flex justify-between gap-2'>
 				<section className='flex items-start gap-[110px]'>
 					{withPageNumber && (
-						<p className={`${fontInter.className} text-[20px]`}>( {pageNumber} )</p>
+						<p className={`${fontInter.className} text-[20px]`}>
+							( {pageNumber} )
+						</p>
 					)}
 					<section className='flex flex-col '>
 						{title?.map((item) => {
@@ -40,13 +43,19 @@ const SectionCover: FC<CoverSectionProps> = ({
 						alt='logo'
 						height={72}
 						width={72}
-						className='w-full h-full object-cover'
+						loading='eager'
+						unoptimized
+						className='h-full w-full object-cover'
 						src={logo}
 					/>
 				</section>
 			</section>
 
-			<ProposalFooter textTheme={"light"} listType={footerType} />
+			<ProposalFooter
+				textTheme={"light"}
+				listType={footerType}
+				footerEnding={footerEnding}
+			/>
 		</section>
 	);
 };

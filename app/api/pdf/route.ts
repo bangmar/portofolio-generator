@@ -4,6 +4,7 @@ import { getBrowserExecutablePath } from "@/lib/helper/pdf/browser";
 
 const PDF_PAGE_WIDTH = 1920;
 const PDF_PAGE_HEIGHT = 1080;
+const RESOURCE_WAIT_TIMEOUT = 15_000;
 
 export async function GET(request: Request) {
 	let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
@@ -28,43 +29,45 @@ export async function GET(request: Request) {
 			timeout: 60_000,
 		});
 		await page.waitForFunction(() => document.readyState === "complete", {
-			timeout: 60_000,
+			timeout: RESOURCE_WAIT_TIMEOUT,
 		});
-		await page.waitForFunction(
-			async () => {
-				await document.fonts.ready;
-				const images = Array.from(document.images);
+		await page.evaluate(async (timeout) => {
+			const waitWithTimeout = async (promise: Promise<unknown>) => {
+				await Promise.race([
+					promise,
+					new Promise((resolve) => window.setTimeout(resolve, timeout)),
+				]);
+			};
 
-				await Promise.all(
-					images.map(async (image) => {
-						if (!image.complete) {
-							await new Promise<void>((resolve) => {
+			await waitWithTimeout(document.fonts.ready);
+			window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+			window.scrollTo({ top: 0, behavior: "instant" });
+
+			const images = Array.from(document.images);
+
+			await Promise.all(
+				images.map(async (image) => {
+					if (!image.complete) {
+						await waitWithTimeout(
+							new Promise<void>((resolve) => {
 								image.addEventListener("load", () => resolve(), { once: true });
-								image.addEventListener("error", () => resolve(), {
-									once: true,
-								});
-							});
-						}
+								image.addEventListener("error", () => resolve(), { once: true });
+							}),
+						);
+					}
 
-						if (typeof image.decode === "function") {
-							try {
-								await image.decode();
-							} catch {}
-						}
-					}),
-				);
+					if (typeof image.decode === "function") {
+						await waitWithTimeout(image.decode().catch(() => undefined));
+					}
+				}),
+			);
 
-				return document.fonts.status === "loaded";
-			},
-			{ timeout: 60_000 },
-		);
-		await page.evaluate(async () => {
 			await new Promise<void>((resolve) => {
 				requestAnimationFrame(() => {
 					requestAnimationFrame(() => resolve());
 				});
 			});
-		});
+		}, RESOURCE_WAIT_TIMEOUT);
 
 		const pdf = await page.pdf({
 			width: "1920px",

@@ -7,6 +7,7 @@ export type ContentSectionProps = {
 	subTitle?: Array<{
 		label?: string;
 	}>;
+	titleSize?: "normal" | "large";
 	withPageNumber?: boolean;
 	pageNumber?: number;
 	children?: ReactElement;

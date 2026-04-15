@@ -10,6 +10,7 @@ const SectionContent: FC<ContentSectionProps> = ({
 	withPageNumber,
 	subTitle,
 	childrenClassName,
+	titleSize = "normal",
 }): ReactElement => {
 	return (
 		<section
@@ -21,12 +22,14 @@ const SectionContent: FC<ContentSectionProps> = ({
 							( {pageNumber} )
 						</p>
 					)}
-					<section className='flex flex-col gap-[40px]'>
+					<section
+						className={`${(title?.length as number) > 0 ? "gap-[40px]" : ""} flex flex-col`}>
 						<section className='flex flex-col '>
 							{title?.map((item) => {
 								return (
 									<section key={item.label} className='flex gap-6 items-center'>
-										<p className='font-bold text-[72px]  block leading-16'>
+										<p
+											className={`font-bold block  ${titleSize === "normal" ? "text-[72px]  leading-16" : "text-[100px]  leading-20"}`}>
 											{item.label}
 										</p>
 									</section>

@@ -1,19 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useState } from "react";
 import { useHome } from "./hook";
 
 export default function HomeFeature() {
 	const { actions } = useHome();
-	const downloadCounterRef = useRef(0);
+	const [isDownloading, setIsDownloading] = useState(false);
 
-	const handleDownload = (href: string) => {
-		downloadCounterRef.current += 1;
+	const handleDownload = async (href: string) => {
+		try {
+			setIsDownloading(true);
 
-		const downloadUrl = new URL(href, window.location.origin);
-		downloadUrl.searchParams.set("t", downloadCounterRef.current.toString());
-		window.open(downloadUrl.toString(), "_blank", "noopener,noreferrer");
+			const response = await fetch(href, {
+				cache: "no-store",
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to download PDF.");
+			}
+
+			const blob = await response.blob();
+			const fileUrl = window.URL.createObjectURL(blob);
+			const link = document.createElement("a");
+
+			link.href = fileUrl;
+			link.download = "proposal.pdf";
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			window.URL.revokeObjectURL(fileUrl);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsDownloading(false);
+		}
 	};
 
 	return (
@@ -21,7 +42,7 @@ export default function HomeFeature() {
 			<div className='flex flex-col gap-4 sm:flex-row'>
 				{actions.map((action) => {
 					const className =
-						"rounded-full border border-text-dark px-6 py-3 text-lg font-medium text-text-dark transition hover:bg-text-dark hover:text-white";
+						"rounded-full border border-text-dark px-6 py-3 text-lg font-medium text-text-dark transition hover:bg-text-dark hover:text-white disabled:cursor-not-allowed disabled:opacity-60";
 
 					if (action.type === "download") {
 						return (
@@ -29,8 +50,9 @@ export default function HomeFeature() {
 								key={action.label}
 								type='button'
 								onClick={() => handleDownload(action.href)}
+								disabled={isDownloading}
 								className={className}>
-								{action.label}
+								{isDownloading ? "Downloading..." : action.label}
 							</button>
 						);
 					}

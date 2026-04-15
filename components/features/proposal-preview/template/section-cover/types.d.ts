@@ -4,6 +4,7 @@ export type CoverSectionProps = {
 		withAscent?: boolean;
 	}>;
 	withPageNumber?: boolean;
-	pageNumber?: number;
+	pageNumber?: string;
 	footerType?: "cover" | "content";
+	footerEnding?: boolean;
 };
