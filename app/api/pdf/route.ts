@@ -13,6 +13,21 @@ function logPdfStage(stage: string, detail?: Record<string, unknown>) {
 	console.info("[pdf]", stage, detail ?? {});
 }
 
+function getBaseUrl(request: Request) {
+	if (process.env.APP_URL) {
+		return process.env.APP_URL;
+	}
+
+	const forwardedProto = request.headers.get("x-forwarded-proto");
+	const forwardedHost = request.headers.get("x-forwarded-host");
+
+	if (forwardedProto && forwardedHost) {
+		return `${forwardedProto}://${forwardedHost}`;
+	}
+
+	return new URL(request.url).origin;
+}
+
 export async function GET(request: Request) {
 	let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
 	let stage = "launch_browser";
@@ -41,10 +56,11 @@ export async function GET(request: Request) {
 		stage = "open_page";
 		logPdfStage(stage);
 		const page = await browser.newPage();
-		const printUrl = new URL("/print", request.url).toString();
+		const baseUrl = getBaseUrl(request);
+		const printUrl = new URL("/print", baseUrl).toString();
 
 		stage = "configure_page";
-		logPdfStage(stage, { printUrl });
+		logPdfStage(stage, { baseUrl, printUrl });
 		await page.setViewport({
 			width: PDF_PAGE_WIDTH,
 			height: PDF_PAGE_HEIGHT,
