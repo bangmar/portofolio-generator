@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer-core";
-import { getBrowserExecutablePath } from "@/lib/helper/pdf/browser";
+import {
+	getBrowserExecutablePath,
+	getBrowserLaunchArgs,
+} from "@/lib/helper/pdf/browser";
 
 const PDF_PAGE_WIDTH = 1920;
 const PDF_PAGE_HEIGHT = 1080;
@@ -11,7 +14,8 @@ export async function GET(request: Request) {
 
 	try {
 		browser = await puppeteer.launch({
-			executablePath: getBrowserExecutablePath(),
+			executablePath: await getBrowserExecutablePath(),
+			args: getBrowserLaunchArgs(),
 			headless: true,
 		});
 
