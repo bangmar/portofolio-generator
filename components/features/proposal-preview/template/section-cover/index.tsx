@@ -1,18 +1,9 @@
 import { FC, ReactElement } from "react";
 import { CoverSectionProps } from "./types";
-import { Bebas_Neue, Inter } from "next/font/google";
 import ProposalFooter from "@/components/ui/footer/proposal";
 import Image from "next/image";
 import logo from "../../../../../src/assets/general/logo.png";
-
-const bebasNeue = Bebas_Neue({
-	weight: "400",
-	subsets: ["latin"],
-});
-
-const inter = Inter({
-	subsets: ["latin"],
-});
+import { fontBebasNeue, fontInter } from "@/lib/constant/font";
 
 const SectionCover: FC<CoverSectionProps> = ({
 	title,
@@ -22,13 +13,11 @@ const SectionCover: FC<CoverSectionProps> = ({
 }): ReactElement => {
 	return (
 		<section
-			className={`${bebasNeue.className} flex h-[270mm] w-[480mm] break-after-page flex-col justify-between bg-text-dark p-10`}>
+			className={`${fontBebasNeue.className} flex h-[1080px] w-[1920px] text-white! break-after-page flex-col justify-between bg-text-dark p-10`}>
 			<section className='flex justify-between gap-2'>
 				<section className='flex items-start gap-[110px]'>
 					{withPageNumber && (
-						<p className={`${inter.className} text-[20px] text-white`}>
-							( {pageNumber} )
-						</p>
+						<p className={`${fontInter.className} text-[20px]`}>( {pageNumber} )</p>
 					)}
 					<section className='flex flex-col '>
 						{title?.map((item) => {
@@ -37,7 +26,7 @@ const SectionCover: FC<CoverSectionProps> = ({
 									{item.withAscent && (
 										<span className='bg-accent-blue h-29 leading-40 w-29 block'></span>
 									)}
-									<p className='font-bold text-[200px] text-white block leading-40'>
+									<p className='font-bold text-[200px] block leading-40'>
 										{item.label}
 									</p>
 								</section>

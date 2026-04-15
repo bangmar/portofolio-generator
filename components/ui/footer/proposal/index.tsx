@@ -1,10 +1,6 @@
-import { Inter } from "next/font/google";
 import { FC, ReactElement } from "react";
 import { ProposalFooterProps } from "./types";
-
-const inter = Inter({
-	subsets: ["latin"],
-});
+import { fontInter } from "@/lib/constant/font";
 
 const ProposalFooter: FC<ProposalFooterProps> = ({
 	textTheme,
@@ -21,11 +17,15 @@ const ProposalFooter: FC<ProposalFooterProps> = ({
 			: ["Inside the deck", "Hatypo Studio", "Design Proposal", "©2026"];
 	return (
 		<section
-			className={`${inter.className} ${textTheme === "dark" ? "text-text-dark" : "text-white"} flex w-full justify-between gap-2 text-[24px]`}>
+			className={`${fontInter.className} ${textTheme === "dark" ? "text-text-dark" : "text-white"} flex w-full justify-between gap-2 text-[20px]`}>
 			{item?.map((item, index) => (
 				<p
 					key={item}
-					className={index === 0 && listType === "content" ? "text-accent-blue" : undefined}>
+					className={
+						index === 0 && listType === "content"
+							? "text-accent-blue"
+							: undefined
+					}>
 					{item}
 				</p>
 			))}
